@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { CATEGORIES, LOCALES } from '@/interfaces/enums.interfaces';
+import { CATEGORIES, LOCALES } from '@/interfaces/interfaces';
 
 export const projects = sqliteTable('projects', {
   project_id: int('id').primaryKey().notNull(),
@@ -16,7 +16,7 @@ export const projects = sqliteTable('projects', {
 });
 
 export const projectTranslations = sqliteTable('project_translations', {
-  project_translate_id: int('id').primaryKey().notNull(),
+  project_translate_id: int('id').primaryKey({autoIncrement: true}).notNull(),
   project_id: int('project_id')
     .notNull()
     .references(() => projects.project_id, { onDelete: 'cascade' }),
@@ -36,5 +36,5 @@ export const projectTranslationsRelations = relations(
       fields: [projectTranslations.project_id],
       references: [projects.project_id],
     }),
-  })
+  }),
 );
