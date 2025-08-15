@@ -1,14 +1,20 @@
-import { Hono } from 'hono'
+import { Hono } from 'hono';
+import { prettyJSON } from 'hono/pretty-json';
+import { logger } from 'hono/logger';
+const app = new Hono();
 
-const app = new Hono()
+app.use(prettyJSON());
+app.use(logger());
 
-const welcomeStrings = [
-  'Hello Hono!',
-  'To learn more about Hono on Vercel, visit https://vercel.com/docs/frameworks/hono',
-]
+app.get('/', async (c) => {
+  return c.json({
+    name: 'Backend_Portafolio',
+    description:
+      'Entornos de envio y recibo de informacion serverless para portafolio',
+    version: '0.0.0',
+    author_name: 'Erick Muke',
+    github_name: 'https://github.com/muke78',
+  });
+});
 
-app.get('/', (c) => {
-  return c.text(welcomeStrings.join('\n\n'))
-})
-
-export default app
+export default app;
