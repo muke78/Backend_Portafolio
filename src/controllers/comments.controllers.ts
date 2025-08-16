@@ -22,11 +22,11 @@ export async function PostComments({
     .insert(comments)
     .values({
       name,
-      job: job || null, // Manejar el caso cuando job es undefined
+      job: job || null,
       description,
       direction,
     })
-    .returning(); // Usar returning() para obtener el registro insertado
+    .returning();
 
-  return result[0]; // Retornar el primer (y único) resultado
+  return result[0];
 }

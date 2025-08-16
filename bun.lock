@@ -10,6 +10,7 @@
         "drizzle-orm": "^0.44.4",
         "drizzle-zod": "^0.8.3",
         "hono": "^4.9.1",
+        "hono-rate-limiter": "0.1.0",
         "zod": "^4.0.17",
       },
       "devDependencies": {
@@ -111,6 +112,8 @@
 
     "@neon-rs/load": ["@neon-rs/load@0.0.4", "", {}, "sha512-kTPhdZyTQxB+2wpiRcFWrDcejc4JI6tkPuS7UZCG4l6Zvc5kU/gGQ/ozvHTh1XR5tS+UlfAfGuPajjzQjCiHCw=="],
 
+    "@swc/helpers": ["@swc/helpers@0.5.17", "", { "dependencies": { "tslib": "^2.8.0" } }, "sha512-5IKx/Y13RsYd+sauPb2x+U/xZikHjolzfuDgTAl/Tdf3Q8rslRvC19NKDLgAJQ6wsqADk10ntlv08nPFw/gO/A=="],
+
     "@types/node": ["@types/node@20.19.10", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-iAFpG6DokED3roLSP0K+ybeDdIX6Bc0Vd3mLW5uDqThPWtNos3E+EqOM11mPQHKzfWHqEBuLjIlsBQQ8CsISmQ=="],
 
     "@types/ws": ["@types/ws@8.18.1", "", { "dependencies": { "@types/node": "*" } }, "sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg=="],
@@ -145,6 +148,8 @@
 
     "hono": ["hono@4.9.1", "", {}, "sha512-qfvdJ42t6CQE0N/iSCa8KsW8SQqYD67YB+TYbwPHlnALvX+s7ynh8otR1NEk5jXtUg73gpV/B82OSufDmwtX3w=="],
 
+    "hono-rate-limiter": ["hono-rate-limiter@0.1.0", "", { "dependencies": { "@swc/helpers": "~0.5.2" }, "peerDependencies": { "hono": "^4.1.1" } }, "sha512-x/v9Q68Q9ucwG3izGjTqWjdcRGQd1l4TA3vWhsv6qz5+Hk6h5npyQG5zUg+65ACge2zfF3tfA29gFUq3LL3mMA=="],
+
     "js-base64": ["js-base64@3.7.8", "", {}, "sha512-hNngCeKxIUQiEUN3GPJOkz4wF/YvdUdbNL9hsBcMQTkKzboD7T/q3OYOuuPZLUE6dBxSGpwhk5mwuDud7JVAow=="],
 
     "libsql": ["libsql@0.5.17", "", { "dependencies": { "@neon-rs/load": "^0.0.4", "detect-libc": "2.0.2" }, "optionalDependencies": { "@libsql/darwin-arm64": "0.5.17", "@libsql/darwin-x64": "0.5.17", "@libsql/linux-arm-gnueabihf": "0.5.17", "@libsql/linux-arm-musleabihf": "0.5.17", "@libsql/linux-arm64-gnu": "0.5.17", "@libsql/linux-arm64-musl": "0.5.17", "@libsql/linux-x64-gnu": "0.5.17", "@libsql/linux-x64-musl": "0.5.17", "@libsql/win32-x64-msvc": "0.5.17" }, "os": [ "linux", "win32", "darwin", ], "cpu": [ "arm", "x64", "arm64", ] }, "sha512-RRlj5XQI9+Wq+/5UY8EnugSWfRmHEw4hn3DKlPrkUgZONsge1PwTtHcpStP6MSNi8ohcbsRgEHJaymA33a8cBw=="],
@@ -162,6 +167,8 @@
     "source-map": ["source-map@0.6.1", "", {}, "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g=="],
 
     "source-map-support": ["source-map-support@0.5.21", "", { "dependencies": { "buffer-from": "^1.0.0", "source-map": "^0.6.0" } }, "sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w=="],
+
+    "tslib": ["tslib@2.8.1", "", {}, "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="],
 
     "tsx": ["tsx@4.20.4", "", { "dependencies": { "esbuild": "~0.25.0", "get-tsconfig": "^4.7.5" }, "optionalDependencies": { "fsevents": "~2.3.3" }, "bin": { "tsx": "dist/cli.mjs" } }, "sha512-yyxBKfORQ7LuRt/BQKBXrpcq59ZvSW0XxwfjAt3w2/8PmdxaFzijtMhTawprSHhpzeM5BgU2hXHG3lklIERZXg=="],
 

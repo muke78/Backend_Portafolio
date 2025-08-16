@@ -6,21 +6,22 @@ export const CATEGORIES = [
 ] as const;
 
 export const LOCALES = ['en', 'es', 'fr'] as const;
+export type Locale = (typeof LOCALES)[number];
 
 export interface Lang {
   currentLocale: string;
 }
 
-export type { 
-  InsertComment, 
-  UserInputComment, 
-  SelectComment 
+export type {
+  InsertComment,
+  UserInputComment,
+  SelectComment,
 } from '@/schemas/comments';
 
 // Enums útiles
 export enum CommentDirection {
   LEFT = 'left',
-  BOTTOM = 'bottom'
+  BOTTOM = 'bottom',
 }
 
 // Tipo para la respuesta de la API
