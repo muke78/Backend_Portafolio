@@ -37,7 +37,7 @@ app.get('/', async (c) => {
     name: 'Backend_Portafolio',
     description:
       'Entornos de envio y recibo de informacion serverless para portafolio',
-    version: '0.0.0',
+    version: '0.0.1',
     author_name: 'Erick Muke',
     github_name: 'https://github.com/muke78',
   });
