@@ -1,9 +1,9 @@
 import { relations } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { LOCALES } from '@/interfaces/enums.interfaces';
+import { LOCALES } from '../interfaces/interfaces.js';
 
 export const experience = sqliteTable('experience', {
-  experience_id: int('id').primaryKey().notNull(),
+  experience_id: int('id').primaryKey({autoIncrement: true}).notNull(),
   work_default: text('work_default'),
   title_default: text('title_default').notNull(),
   subtitle_default: text('subtitle_default').notNull(),
@@ -14,12 +14,12 @@ export const experience = sqliteTable('experience', {
 });
 
 export const experienceTranslations = sqliteTable('experience_translations', {
-  experience_translate_id: int('id').primaryKey().notNull(),
+  experience_translate_id: int('id').primaryKey({autoIncrement: true}).notNull(),
   experience_id: int('experience_id')
     .notNull()
     .references(() => experience.experience_id, { onDelete: 'cascade' }),
   locale: text('locale', { enum: LOCALES }).notNull(),
-  work: text('work_default'),
+  work: text('work'),
   title: text('title').notNull(),
   subtitle: text('subtitle').notNull(),
   time: text('time').notNull(),
