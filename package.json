@@ -14,7 +14,6 @@
     "drizzle-orm": "^0.44.4",
     "drizzle-zod": "^0.8.3",
     "hono": "^4.9.1",
-    "hono-rate-limiter": "0.1.0",
     "zod": "^4.0.17"
   },
   "devDependencies": {

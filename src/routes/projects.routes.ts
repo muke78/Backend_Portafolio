@@ -1,5 +1,5 @@
-import { GetAllProjects } from '@/controllers/projects.controllers';
-import { ApiResponse, Locale, LOCALES } from '@/interfaces/interfaces';
+import { GetAllProjects } from '../controllers/projects.controllers.js';
+import { ApiResponse, Locale, LOCALES } from '../interfaces/interfaces.js';
 import { Hono } from 'hono';
 
 const router = new Hono();

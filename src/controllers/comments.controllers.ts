@@ -1,7 +1,7 @@
 // controllers/comments.controllers.ts
-import { InsertComment, SelectComment } from '@/schemas/comments';
-import { db } from '@/lib/db';
-import { comments } from '@/schemas/comments';
+import { InsertComment, SelectComment } from '../schemas/comments.js';
+import { db } from '../lib/db.js';
+import { comments } from '../schemas/comments.js';
 
 export async function GetAllComments(): Promise<SelectComment[]> {
   const allComments = await db.select().from(comments).all();

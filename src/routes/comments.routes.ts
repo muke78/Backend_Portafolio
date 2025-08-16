@@ -1,9 +1,9 @@
 import {
   GetAllComments,
   PostComments,
-} from '@/controllers/comments.controllers';
-import { userInputSchema } from '@/schemas/comments';
-import { ApiResponse } from '@/interfaces/interfaces';
+} from '../controllers/comments.controllers.js';
+import { userInputSchema } from '../schemas/comments.js';
+import { ApiResponse } from '../interfaces/interfaces.js';
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 

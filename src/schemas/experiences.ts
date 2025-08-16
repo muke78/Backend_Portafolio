@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { LOCALES } from '@/interfaces/interfaces';
+import { LOCALES } from '../interfaces/interfaces.js';
 
 export const experience = sqliteTable('experience', {
   experience_id: int('id').primaryKey({autoIncrement: true}).notNull(),

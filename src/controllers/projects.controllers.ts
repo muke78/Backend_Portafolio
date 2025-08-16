@@ -1,8 +1,8 @@
-import { projectTranslations, projects } from '@/schemas/projects';
-import { db } from '@/lib/db';
+import { projectTranslations, projects } from '../schemas/projects.js';
+import { db } from '../lib/db.js';
 
 import { and, eq, sql } from 'drizzle-orm';
-import { Lang } from '@/interfaces/interfaces';
+import { Lang } from '../interfaces/interfaces.js';
 
 export const GetAllProjects = async ({ currentLocale }: Lang) => {
   const getAllProjects = await db
