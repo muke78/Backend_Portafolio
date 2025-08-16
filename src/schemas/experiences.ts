@@ -19,7 +19,7 @@ export const experienceTranslations = sqliteTable('experience_translations', {
     .notNull()
     .references(() => experience.experience_id, { onDelete: 'cascade' }),
   locale: text('locale', { enum: LOCALES }).notNull(),
-  work: text('work_default'),
+  work: text('work'),
   title: text('title').notNull(),
   subtitle: text('subtitle').notNull(),
   time: text('time').notNull(),

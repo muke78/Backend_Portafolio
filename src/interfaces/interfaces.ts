@@ -12,6 +12,13 @@ export interface Lang {
   currentLocale: string;
 }
 
+export interface Telegrm {
+  name: string;
+  email: string;
+  phone: number;
+  moreInformation: string;
+}
+
 export type {
   InsertComment,
   UserInputComment,

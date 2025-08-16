@@ -4,7 +4,7 @@ import { db } from '../lib/db.js';
 import { and, eq, sql } from 'drizzle-orm';
 import { Lang } from '../interfaces/interfaces.js';
 
-export const GetAllProjects = async ({ currentLocale }: Lang) => {
+export async function GetAllProjects ({ currentLocale }: Lang) {
   const getAllProjects = await db
     .select({
       project_id: projects.project_id,

@@ -4,6 +4,8 @@ import { logger } from 'hono/logger';
 import { cors } from 'hono/cors';
 import comments from './routes/comments.routes.js';
 import projects from './routes/projects.routes.js';
+import experiences from './routes/experiences.routes.js';
+import tlgrm from './routes/telegram.routes.js';
 
 const app = new Hono().basePath('/de342e8b-2813-46d1-8a8e-4a1c41e62b72');
 
@@ -27,6 +29,8 @@ app.use(logger());
 
 app.route('/comments', comments);
 app.route('/projects', projects);
+app.route('/experiences', experiences);
+app.route('/tlgrm', tlgrm);
 
 app.get('/', async (c) => {
   return c.json({
