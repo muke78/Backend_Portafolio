@@ -13,11 +13,10 @@ const app = new Hono().basePath('/de342e8b-2813-46d1-8a8e-4a1c41e62b72');
 app.use(
   cors({
     origin: ['https://khelde.vercel.app', 'http://localhost:4321'],
-    allowHeaders: ['X-Custom-Header', 'Upgrade-Insecure-Requests'],
+    allowHeaders: ['X-Custom-Header', 'Upgrade-Insecure-Requests', 'Content-Type'],
     allowMethods: ['POST', 'GET', 'OPTIONS'],
     exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
     maxAge: 600,
-    credentials: true,
   })
 );
 
