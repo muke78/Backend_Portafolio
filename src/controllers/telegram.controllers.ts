@@ -2,8 +2,8 @@ import 'dotenv/config';
 import { Telegrm } from '../interfaces/interfaces.js';
 
 export async function PostCommentsTelegramBot(payload: Telegrm) {
-  const botToken = process.env.VITE_BOT_TOKEN;
-  const chatId = process.env.VITE_CHAT_ID;
+  const botToken = process.env.BOT_TOKEN;
+  const chatId = process.env.CHAT_ID;
 
   const message = `📩 *Nuevo formulario enviado*\n
   🔹 *Nombre:* ${payload.name}
