@@ -1,6 +1,6 @@
-import { Lang } from '../interfaces/interfaces.js';
+import { Lang } from '../interfaces/interfaces';
 import { db } from '../lib/db.js';
-import { experience, experienceTranslations } from '../schemas/experiences.js';
+import { experience, experienceTranslations } from '../schemas/experiences';
 import { eq, sql, and} from 'drizzle-orm';
 
 export async function GetAllExperiences({ currentLocale }: Lang) {

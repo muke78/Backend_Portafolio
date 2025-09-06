@@ -1,0 +1,1 @@
+ALTER TABLE `comments` ALTER COLUMN "country_flag" TO "country_flag" text NOT NULL;

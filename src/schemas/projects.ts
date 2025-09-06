@@ -1,13 +1,13 @@
 import { relations } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { CATEGORIES, LOCALES } from '../interfaces/interfaces.js';
+import { CATEGORIES, LOCALES } from '../interfaces/interfaces';
 
 export const projects = sqliteTable('projects', {
   project_id: int('id').primaryKey().notNull(),
   slug: text('slug').notNull(),
   category: text('category', { enum: CATEGORIES }).notNull(),
   card_image: text('card_image').notNull(),
-  images_topics: text('images_topics').notNull(), // Podrías usar JSON.stringify para array
+  images_topics: text('images_topics').notNull(),
   link_repo: text('link_repo'),
   link_web: text('link_web'),
   title_default: text('title_default').notNull(),
