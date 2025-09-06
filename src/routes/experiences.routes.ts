@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { GetAllExperiences } from '../controllers/experiences.controllers.js';
-import { ApiResponse, Locale, LOCALES } from '../interfaces/interfaces.js';
+import { GetAllExperiences } from '../controllers/experiences.controllers';
+import { ApiResponse, Locale, LOCALES } from '../interfaces/interfaces';
 
 const router = new Hono();
 

@@ -1,5 +1,5 @@
-import { projectTranslations, projects } from '../schemas/projects.js';
-import { db } from '../lib/db.js';
+import { projectTranslations, projects } from '../schemas/projects';
+import { db } from '../lib/db';
 
 import { and, eq, sql } from 'drizzle-orm';
 import { Lang } from '../interfaces/interfaces.js';
