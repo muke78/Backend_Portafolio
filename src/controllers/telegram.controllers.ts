@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { Telegrm } from '../interfaces/interfaces';
+import { Telegrm } from '../interfaces/interfaces.js';
 
 export async function PostCommentsTelegramBot(payload: Telegrm) {
   const botToken = process.env.BOT_TOKEN;
