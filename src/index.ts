@@ -2,10 +2,12 @@ import { Hono } from 'hono';
 import { prettyJSON } from 'hono/pretty-json';
 import { logger } from 'hono/logger';
 import { cors } from 'hono/cors';
-import comments from './routes/comments.routes.js';
-import projects from './routes/projects.routes.js';
-import experiences from './routes/experiences.routes.js';
-import tlgrm from './routes/telegram.routes.js';
+import comments from './routes/comments.routes';
+import projects from './routes/projects.routes';
+import experiences from './routes/experiences.routes';
+import tlgrm from './routes/telegram.routes';
+import { customLogger } from './middleware/logger.middleware';
+import { errorHandler } from './middleware/errorHandler.middleware';
 
 const app = new Hono().basePath('/de342e8b-2813-46d1-8a8e-4a1c41e62b72');
 
@@ -19,6 +21,10 @@ app.use(
     maxAge: 600,
   })
 );
+
+// Middlewares globales
+app.use('*', errorHandler);
+app.use('*', customLogger);
 
 // Formateador de JSON
 app.use(prettyJSON({ space: 4 }));
