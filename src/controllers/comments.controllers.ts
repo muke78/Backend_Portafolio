@@ -12,6 +12,7 @@ export async function PostComments({
   name,
   job,
   description,
+  country_flag,
 }: Omit<InsertComment, 'direction'>): Promise<SelectComment> {
   // Contar los comentarios actuales para alternar la dirección
   const existing = await db.select().from(comments);
@@ -22,9 +23,11 @@ export async function PostComments({
     .insert(comments)
     .values({
       name,
-      job: job || null,
+      job: job ?? null,
       description,
       direction,
+      country_flag,
+      created_at: new Date().toISOString()
     })
     .returning();
 

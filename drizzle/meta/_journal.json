@@ -50,6 +50,20 @@
       "when": 1757131206595,
       "tag": "0006_huge_scalphunter",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1757132879486,
+      "tag": "0007_soft_shatterstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1757132939835,
+      "tag": "0008_red_strong_guy",
+      "breakpoints": true
     }
   ]
 }

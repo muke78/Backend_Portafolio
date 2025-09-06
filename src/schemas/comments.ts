@@ -11,7 +11,7 @@ export const comments = sqliteTable('comments', {
   description: text().notNull(),
   direction: text().notNull(),
   country_flag: text(),
-  cretaed_at: text('cretaed_at')
+  created_at: text('created_at')
     .notNull()
     .default(sql`(current_timestamp)`),
 });
@@ -30,6 +30,8 @@ export const insertCommentsSchema = createInsertSchema(comments, {
   direction: z.enum(['left', 'bottom'], {
     message: "La dirección debe ser 'left' o 'bottom'",
   }),
+  country_flag: z.string().optional(),
+  created_at: z.date().default(() => new Date()),
 }).omit({ comment_id: true });
 
 // Schema para el input del usuario (sin direction porque se calcula automáticamente)
