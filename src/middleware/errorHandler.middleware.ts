@@ -13,7 +13,15 @@ export const errorHandler = async (c: Context, next: Next) => {
     }\nStack: ${err.stack || 'No stack'}\n\n`;
 
     // Guardar en archivo
-    fs.appendFileSync(errorLogFile, log);
+    try {
+      const logDir = path.dirname(errorLogFile);
+      await fs.promises.mkdir(logDir, { recursive: true });
+      await fs.promises.appendFile(errorLogFile, log);
+    } catch (logError) {
+      // Fallback to console if file logging fails
+      console.error('Failed to write to error log file:', logError);
+      console.error('Original error details:', log);
+    }
 
     return c.json(
       {

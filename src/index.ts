@@ -23,8 +23,9 @@ app.use(
 );
 
 // Middlewares globales
-app.use('*', errorHandler);
-app.use('*', customLogger);
+app.use('*', customLogger);  
+app.use('*', errorHandler);  
+
 
 // Formateador de JSON
 app.use(prettyJSON({ space: 4 }));
