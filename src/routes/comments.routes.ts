@@ -3,9 +3,9 @@ import { Hono } from "hono";
 import {
 	GetAllComments,
 	PostComments,
-} from "../controllers/comments.controllers";
-import type { ApiResponse } from "../interfaces/interfaces";
-import { userInputSchema } from "../schemas/comments";
+} from "../controllers/comments.controllers.js";
+import type { ApiResponse } from "../interfaces/interfaces.js";
+import { userInputSchema } from "../schemas/comments.js";
 
 const router = new Hono();
 

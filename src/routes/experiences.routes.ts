@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { GetAllExperiences } from "../controllers/experiences.controllers";
+import { GetAllExperiences } from "../controllers/experiences.controllers.js";
 import {
 	type ApiResponse,
 	LOCALES,

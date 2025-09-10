@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { GetAllProjects } from "../controllers/projects.controllers";
+import { GetAllProjects } from "../controllers/projects.controllers.js";
 import {
 	type ApiResponse,
 	LOCALES,

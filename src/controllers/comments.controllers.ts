@@ -1,10 +1,10 @@
 import { sql } from "drizzle-orm";
-import { db } from "../lib/db";
+import { db } from "../lib/db.js";
 import {
 	comments,
 	type InsertComment,
 	type SelectComment,
-} from "../schemas/comments";
+} from "../schemas/comments.js";
 
 export async function GetAllComments(): Promise<SelectComment[]> {
 	const allComments = (
