@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { CATEGORIES, LOCALES } from "../interfaces/interfaces.js";
+import { CATEGORIES, LOCALES } from "../interfaces/interfaces";
 
 export const projects = sqliteTable("projects", {
 	project_id: int("id").primaryKey().notNull(),

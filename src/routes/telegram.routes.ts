@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { PostCommentsTelegramBot } from "../controllers/telegram.controllers.js";
-import type { ApiResponse, Telegrm } from "../interfaces/interfaces.js";
+import { PostCommentsTelegramBot } from "../controllers/telegram.controllers";
+import type { ApiResponse, Telegrm } from "../interfaces/interfaces";
 
 const router = new Hono();
 

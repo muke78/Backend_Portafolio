@@ -1,6 +1,6 @@
 import { and, eq, sql } from "drizzle-orm";
-import type { Lang } from "../interfaces/interfaces.js";
-import { db } from "../lib/db.js";
+import type { Lang } from "../interfaces/interfaces";
+import { db } from "../lib/db";
 import { projects, projectTranslations } from "../schemas/projects.js";
 
 export async function GetAllProjects({ currentLocale }: Lang) {

@@ -23,7 +23,7 @@ export type {
 	InsertComment,
 	SelectComment,
 	UserInputComment,
-} from "../schemas/comments.js";
+} from "../schemas/comments";
 
 // Enums útiles
 export enum CommentDirection {
