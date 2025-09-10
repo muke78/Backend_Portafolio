@@ -50,7 +50,7 @@ export async function PostComments({
 			description,
 			direction,
 			country_flag,
-			country,
+			country: country ?? null,
 			created_at: new Date().toISOString(),
 		})
 		.returning();
