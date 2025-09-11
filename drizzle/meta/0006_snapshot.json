@@ -1,8 +1,8 @@
 {
 	"version": "6",
 	"dialect": "sqlite",
-	"id": "61139b6a-e28d-4416-9c61-1032ecce67ec",
-	"prevId": "00000000-0000-0000-0000-000000000000",
+	"id": "297e7fae-de6c-41a1-9626-1468b000c533",
+	"prevId": "27ebfc2d-c7ba-4470-9eae-b4c98db9d22a",
 	"tables": {
 		"comments": {
 			"name": "comments",
@@ -12,7 +12,7 @@
 					"type": "integer",
 					"primaryKey": true,
 					"notNull": true,
-					"autoincrement": false
+					"autoincrement": true
 				},
 				"name": {
 					"name": "name",
@@ -41,6 +41,21 @@
 					"primaryKey": false,
 					"notNull": true,
 					"autoincrement": false
+				},
+				"country_flag": {
+					"name": "country_flag",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"cretaed_at": {
+					"name": "cretaed_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(current_timestamp)"
 				}
 			},
 			"indexes": {},
@@ -57,7 +72,7 @@
 					"type": "integer",
 					"primaryKey": true,
 					"notNull": true,
-					"autoincrement": false
+					"autoincrement": true
 				},
 				"work_default": {
 					"name": "work_default",
@@ -123,7 +138,7 @@
 					"type": "integer",
 					"primaryKey": true,
 					"notNull": true,
-					"autoincrement": false
+					"autoincrement": true
 				},
 				"experience_id": {
 					"name": "experience_id",
@@ -139,8 +154,8 @@
 					"notNull": true,
 					"autoincrement": false
 				},
-				"work_default": {
-					"name": "work_default",
+				"work": {
+					"name": "work",
 					"type": "text",
 					"primaryKey": false,
 					"notNull": false,
@@ -199,7 +214,7 @@
 					"type": "integer",
 					"primaryKey": true,
 					"notNull": true,
-					"autoincrement": false
+					"autoincrement": true
 				},
 				"project_id": {
 					"name": "project_id",
@@ -332,7 +347,9 @@
 	"_meta": {
 		"schemas": {},
 		"tables": {},
-		"columns": {}
+		"columns": {
+			"\"comments\".\"timestamp\"": "\"comments\".\"cretaed_at\""
+		}
 	},
 	"internal": {
 		"indexes": {}

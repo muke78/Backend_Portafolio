@@ -1,0 +1,1 @@
+ALTER TABLE `comments` ALTER COLUMN "timestamp" TO "timestamp" text NOT NULL;

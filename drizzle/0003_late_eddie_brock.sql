@@ -1,0 +1,1 @@
+ALTER TABLE `experience` RENAME COLUMN "work_default" TO "work_default";

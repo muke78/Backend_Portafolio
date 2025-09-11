@@ -1,8 +1,8 @@
 {
 	"version": "6",
 	"dialect": "sqlite",
-	"id": "61139b6a-e28d-4416-9c61-1032ecce67ec",
-	"prevId": "00000000-0000-0000-0000-000000000000",
+	"id": "f4730406-be73-4c76-b1ba-1e86e0d1c05c",
+	"prevId": "54ac80ba-418b-4672-9965-99351c4cf1fd",
 	"tables": {
 		"comments": {
 			"name": "comments",
@@ -12,7 +12,7 @@
 					"type": "integer",
 					"primaryKey": true,
 					"notNull": true,
-					"autoincrement": false
+					"autoincrement": true
 				},
 				"name": {
 					"name": "name",
@@ -57,7 +57,7 @@
 					"type": "integer",
 					"primaryKey": true,
 					"notNull": true,
-					"autoincrement": false
+					"autoincrement": true
 				},
 				"work_default": {
 					"name": "work_default",
@@ -123,7 +123,7 @@
 					"type": "integer",
 					"primaryKey": true,
 					"notNull": true,
-					"autoincrement": false
+					"autoincrement": true
 				},
 				"experience_id": {
 					"name": "experience_id",
@@ -139,8 +139,8 @@
 					"notNull": true,
 					"autoincrement": false
 				},
-				"work_default": {
-					"name": "work_default",
+				"work": {
+					"name": "work",
 					"type": "text",
 					"primaryKey": false,
 					"notNull": false,
@@ -199,7 +199,7 @@
 					"type": "integer",
 					"primaryKey": true,
 					"notNull": true,
-					"autoincrement": false
+					"autoincrement": true
 				},
 				"project_id": {
 					"name": "project_id",
@@ -332,7 +332,9 @@
 	"_meta": {
 		"schemas": {},
 		"tables": {},
-		"columns": {}
+		"columns": {
+			"\"experience_translations\".\"work_default\"": "\"experience_translations\".\"work\""
+		}
 	},
 	"internal": {
 		"indexes": {}
