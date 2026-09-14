@@ -180,7 +180,7 @@ onion: el primero registrado envuelve a los siguientes).
 | `hono/csrf` | ✅ nuevo, con matiz documentado | Ver "Nota honesta sobre CSRF" abajo — se agrega como defensa en profundidad barata, no como el mecanismo principal. |
 | `hono/basic-auth` | ❌ no aplica | Ya hay bearer auth; no hace falta un segundo esquema. |
 | `hono/cache` | ❌ no todavía | Tiene sentido una vez que exista invalidación por escritura real (TODO.md §5.3 de Portafolio, ligado a las tablas nuevas) — cachear ahora sin eso deja datos viejos tras cada cambio del admin. |
-| `hono/combine` | ❌ no todavía | Útil cuando haya que aplicar sets de middleware distintos a rutas públicas vs. admin en más rutas (Fase 4b, CRUD de `projects`/`experiences`) — con solo 4 rutas admin hoy (Fase 4a) no vale la pena todavía. |
+| `hono/combine` | ❌ no hace falta | Con las 10 rutas admin de la Fase 4b (`comments`, `contact-messages`, `projects`, `experiences`) cada una sigue aplicando `adminAuth` inline sin repetición real de sets de middleware - no hay un caso concreto todavía que lo justifique. |
 | `hono/context-storage` | ❌ no | `c` ya se pasa explícito a todo lo que lo necesita; no hay un caso real hoy que justifique `AsyncLocalStorage`. |
 | `hono/ip-restriction` | ❌ no aplica | El admin no trabaja desde IPs fijas. |
 | `hono/jsx-renderer` | ❌ no aplica | Esto es una API pura, sin JSX/HTML. |
@@ -299,9 +299,14 @@ Documentado en detalle en el plan de sesión
   `API_TOKEN` fijo, aplicado a `GET/PUT` de `comments`/`contact_messages`
   admin. Ver [`03-hono-admin-auth.md`](03-hono-admin-auth.md) — incluye
   la reparación real (esta vez sí) de `__drizzle_migrations`.
-- **Fase 4b**: CRUD completo (`POST`/`PUT`/`DELETE`) de `projects` y
-  `experiences`, protegido por el JWT de 4a — hoy no existe nada de
-  escritura para estos dos recursos en Hono.
+- **Fase 4b** ✅ hecha — CRUD completo (`POST`/`PUT`/`DELETE`) de
+  `projects` y `experiences`, protegido por el JWT de 4a, con
+  transacciones reales y cascada verificada. Ver
+  [`04-hono-projects-experiences-crud.md`](04-hono-projects-experiences-crud.md)
+  — incluye un hallazgo real de seguridad (CSRF bloqueando `DELETE` sin
+  `Content-Type`) y las convenciones nuevas de código (tests por
+  recurso, límite de 250 líneas por archivo, tipos centralizados en
+  `interfaces.ts`, checklist OWASP) vigentes desde aquí en adelante.
 - **Fase 4c** (repo Portafolio): `login.ts` deja de comparar
   `ADMIN_PASSWORD` (se elimina) y llama a `POST /auth/login`;
   `adminSession.ts` embebe el JWT en la cookie de sesión existente;

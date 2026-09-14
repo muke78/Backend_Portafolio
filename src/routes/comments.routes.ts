@@ -1,5 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import type { JwtVariables } from "hono/jwt";
 import {
 	GetAllComments,
@@ -8,6 +9,9 @@ import {
 	UpdateCommentStatus,
 } from "../controllers/comments.controllers.js";
 import type { ApiResponse } from "../interfaces/interfaces.js";
+import { auditLog } from "../lib/auditLog.js";
+import { parseId } from "../lib/parseId.js";
+import { zodErrorHook } from "../lib/zodErrorHook.js";
 import { adminAuth } from "../middleware/adminAuth.middleware.js";
 import { rateLimit } from "../middleware/rateLimit.middleware.js";
 import {
@@ -21,10 +25,7 @@ const router = new Hono<{ Variables: JwtVariables }>();
 router.get("/", async (c) => {
 	const result = await GetAllComments();
 	return c.json(
-		{
-			success: true,
-			data: result,
-		} as ApiResponse<typeof result>,
+		{ success: true, data: result } as ApiResponse<typeof result>,
 		200,
 	);
 });
@@ -35,10 +36,7 @@ router.get("/", async (c) => {
 router.get("/admin", adminAuth, async (c) => {
 	const result = await GetAllCommentsAdmin();
 	return c.json(
-		{
-			success: true,
-			data: result,
-		} as ApiResponse<typeof result>,
+		{ success: true, data: result } as ApiResponse<typeof result>,
 		200,
 	);
 });
@@ -49,23 +47,7 @@ router.get("/admin", adminAuth, async (c) => {
 router.post(
 	"/",
 	rateLimit({ limit: 5, windowMs: 60_000 }),
-	// Hook de error: sin esto, @hono/zod-validator devuelve el ZodError
-	// crudo ({success:false, error:{name,message,...}}) - inconsistente con
-	// el shape ApiResponse que usa el resto de la API (y expone la forma
-	// interna del schema). Mismo hook en contactMessages.routes.ts/
-	// auth.routes.ts.
-	zValidator("json", userInputSchema, (result, c) => {
-		if (!result.success) {
-			return c.json(
-				{
-					success: false,
-					message: "Datos invalidos",
-					errors: result.error.issues,
-				} as ApiResponse<null>,
-				400,
-			);
-		}
-	}),
+	zValidator("json", userInputSchema, zodErrorHook),
 	async (c) => {
 		const data = c.req.valid("json");
 
@@ -85,38 +67,23 @@ router.post(
 router.put(
 	"/:id",
 	adminAuth,
-	zValidator("json", updateCommentStatusSchema, (result, c) => {
-		if (!result.success) {
-			return c.json(
-				{
-					success: false,
-					message: "Datos invalidos",
-					errors: result.error.issues,
-				} as ApiResponse<null>,
-				400,
-			);
-		}
-	}),
+	zValidator("json", updateCommentStatusSchema, zodErrorHook),
 	async (c) => {
-		const id = Number(c.req.param("id"));
-		if (!Number.isInteger(id)) {
-			return c.json(
-				{ success: false, message: "id invalido" } as ApiResponse<null>,
-				400,
-			);
-		}
+		const id = parseId(c.req.param("id"));
 
 		const { status } = c.req.valid("json");
 		const result = await UpdateCommentStatus(id, status);
 		if (!result) {
-			return c.json(
-				{
-					success: false,
-					message: "Comentario no encontrado",
-				} as ApiResponse<null>,
-				404,
-			);
+			throw new HTTPException(404, { message: "Comentario no encontrado" });
 		}
+
+		const { email } = c.get("jwtPayload");
+		auditLog({
+			adminEmail: email,
+			action: "update",
+			resource: "comments",
+			resourceId: id,
+		});
 
 		return c.json(
 			{ success: true, data: result } as ApiResponse<typeof result>,

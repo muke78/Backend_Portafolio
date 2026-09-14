@@ -1,8 +1,10 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { sign } from "hono/jwt";
 import { VerifyLogin } from "../controllers/auth.controllers.js";
 import type { ApiResponse } from "../interfaces/interfaces.js";
+import { zodErrorHook } from "../lib/zodErrorHook.js";
 import { adminJwtSecret } from "../middleware/adminAuth.middleware.js";
 import { rateLimit } from "../middleware/rateLimit.middleware.js";
 import { loginInputSchema } from "../schemas/users.js";
@@ -18,33 +20,30 @@ router.post(
 	// Mismo limite que /comments - el login es el blanco obvio de fuerza
 	// bruta, y este endpoint es publico (no hay JWT todavia para pedirlo).
 	rateLimit({ limit: 5, windowMs: 5 * 60 * 1000 }),
-	zValidator("json", loginInputSchema, (result, c) => {
-		if (!result.success) {
-			return c.json(
-				{
-					success: false,
-					message: "Datos invalidos",
-					errors: result.error.issues,
-				} as ApiResponse<null>,
-				400,
-			);
-		}
-	}),
+	zValidator("json", loginInputSchema, zodErrorHook),
 	async (c) => {
 		const { email, password } = c.req.valid("json");
 		const result = await VerifyLogin({ email, password });
 
 		if (!result.ok) {
-			return c.json(
-				{ success: false, message: "Invalid credentials" } as ApiResponse<null>,
-				401,
+			// Log de auditoria: intento fallido (OWASP A09 - necesario para
+			// detectar fuerza bruta, aunque el rate limit ya la frene). No se
+			// loguea el password, solo el email intentado.
+			console.warn(
+				`[AUDIT] [${new Date().toISOString()}] ${email} login-failed`,
 			);
+			throw new HTTPException(401, { message: "Invalid credentials" });
 		}
 
 		const exp = Math.floor(Date.now() / 1000) + JWT_TTL_SECONDS;
 		const token = await sign(
 			{ sub: String(result.userId), email: result.email, exp },
 			adminJwtSecret,
+		);
+
+		// Log de auditoria: evento de autenticacion exitoso (OWASP A09).
+		console.log(
+			`[AUDIT] [${new Date().toISOString()}] ${result.email} login-success`,
 		);
 
 		return c.json(

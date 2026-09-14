@@ -1,17 +1,18 @@
 /**
  * Doble generico de `db` (drizzle) para tests. Los controllers de este
- * repo solo hacen dos formas de query: cadenas `select().from()...` que
- * terminan en `.all()` o se awaitan directo, y `insert().values().returning()`.
- * Drizzle's query builders son "thenables" (resuelven al awaitarlos
- * directamente, sin necesitar `.all()`) - este doble imita esa forma sin
- * tener que re-implementar cada metodo real: cualquier propiedad
- * encadenada devuelve otro eslabon encadenable, y `await` en cualquier
- * punto de la cadena resuelve al resultado que el test haya configurado
- * con `setFakeDbResult`.
+ * repo solo hacen tres formas de query: cadenas `select().from()...` que
+ * terminan en `.all()` o se awaitan directo, `insert().values().returning()`,
+ * y `update().set().where().returning()` (mas `delete()` y `transaction()`
+ * desde la Fase 4b). Drizzle's query builders son "thenables" (resuelven
+ * al awaitarlos directamente, sin necesitar `.all()`) - este doble imita
+ * esa forma sin tener que re-implementar cada metodo real: cualquier
+ * propiedad encadenada devuelve otro eslabon encadenable, y `await` en
+ * cualquier punto de la cadena resuelve al resultado que el test haya
+ * configurado con `setFakeDbResult`.
  *
- * Por que un mock y no golpear Turso real en los tests: los tests de
- * `POST /comments`/`POST /contact-messages` insertarian filas reales en
- * la base de produccion en cada corrida (incluyendo cada `pre-push`) -
+ * Por que un mock y no golpear Turso real en los tests: los tests que
+ * escriben (POST/PUT/DELETE) insertarian/modificarian filas reales en la
+ * base de produccion en cada corrida (incluyendo cada `pre-push`) -
  * inaceptable. Ver docs/00-auditoria.md, seccion de testing.
  */
 
@@ -19,19 +20,34 @@
 type Chainable = any;
 
 const state: { current: unknown } = { current: [] };
-let lastInsertValues: unknown;
-let lastUpdateValues: unknown;
+
+// Historial completo de llamadas a `.values(...)`/`.set(...)`, no solo la
+// ultima - un controller como CreateProject hace DOS inserts en la misma
+// transaccion (fila principal + traducciones), y quedarse solo con "la
+// ultima" pisaba la primera silenciosamente. `getLastInsertValues()` se
+// mantiene como azucar sobre el ultimo elemento para no romper los tests
+// que ya la usaban con un solo insert.
+const insertCalls: unknown[] = [];
+const updateCalls: unknown[] = [];
 
 export const setFakeDbResult = (value: unknown): void => {
 	state.current = value;
 };
 
-// Lo que el controller le paso a `.insert(...).values(x)`/`.update(...).set(x)`
-// la ultima vez - para probar que "status: pending" (o el cambio de
-// status que sea) realmente se manda, no solo confiar en que el shape de
-// la respuesta se ve bien.
-export const getLastInsertValues = (): unknown => lastInsertValues;
-export const getLastUpdateValues = (): unknown => lastUpdateValues;
+// Limpia el historial de llamadas entre tests - evita que una asercion
+// de `getInsertCalls()` en un test vea llamadas de un test anterior que
+// no llamo a esto.
+export const resetFakeDbCalls = (): void => {
+	insertCalls.length = 0;
+	updateCalls.length = 0;
+};
+
+export const getInsertCalls = (): unknown[] => insertCalls;
+export const getUpdateCalls = (): unknown[] => updateCalls;
+export const getLastInsertValues = (): unknown =>
+	insertCalls[insertCalls.length - 1];
+export const getLastUpdateValues = (): unknown =>
+	updateCalls[updateCalls.length - 1];
 
 const chainable = (): Chainable => {
 	const target = (..._args: unknown[]) => chainable();
@@ -42,13 +58,13 @@ const chainable = (): Chainable => {
 			}
 			if (prop === "values") {
 				return (arg: unknown) => {
-					lastInsertValues = arg;
+					insertCalls.push(arg);
 					return chainable();
 				};
 			}
 			if (prop === "set") {
 				return (arg: unknown) => {
-					lastUpdateValues = arg;
+					updateCalls.push(arg);
 					return chainable();
 				};
 			}
@@ -57,8 +73,30 @@ const chainable = (): Chainable => {
 	});
 };
 
-export const fakeDb = {
+interface FakeQueryBuilder {
+	select: (..._args: unknown[]) => Chainable;
+	insert: (..._args: unknown[]) => Chainable;
+	update: (..._args: unknown[]) => Chainable;
+	delete: (..._args: unknown[]) => Chainable;
+}
+
+const baseFakeDb: FakeQueryBuilder = {
 	select: (..._args: unknown[]) => chainable(),
 	insert: (..._args: unknown[]) => chainable(),
 	update: (..._args: unknown[]) => chainable(),
+	delete: (..._args: unknown[]) => chainable(),
+};
+
+export const fakeDb: FakeQueryBuilder & {
+	transaction: <T>(cb: (tx: FakeQueryBuilder) => Promise<T>) => Promise<T>;
+} = {
+	...baseFakeDb,
+	// `tx` es el mismo doble - comparte estado con `db` (mismo
+	// `state.current`/historial de llamadas), suficiente para probar que
+	// el controller llama a los metodos correctos dentro de la
+	// transaccion, no para probar aislamiento real (eso solo lo prueba
+	// Turso real, ver la verificacion end-to-end en los docs de cada fase).
+	transaction: async <T>(
+		cb: (tx: FakeQueryBuilder) => Promise<T>,
+	): Promise<T> => cb(baseFakeDb),
 };

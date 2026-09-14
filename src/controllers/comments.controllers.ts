@@ -1,11 +1,11 @@
 import { count, eq, sql } from "drizzle-orm";
-import type { CommentStatus } from "../interfaces/interfaces.js";
+import type {
+	CommentStatus,
+	InsertComment,
+	SelectComment,
+} from "../interfaces/interfaces.js";
 import { db } from "../lib/db.js";
-import {
-	comments,
-	type InsertComment,
-	type SelectComment,
-} from "../schemas/comments.js";
+import { comments } from "../schemas/comments.js";
 
 const PUBLIC_COLUMNS = {
 	comment_id: comments.comment_id,
