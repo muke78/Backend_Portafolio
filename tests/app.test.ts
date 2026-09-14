@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, spyOn } from "bun:test";
 import app from "../src/index.js";
-import { setFakeDbResult } from "./mocks/fakeDb.js";
+import { getLastInsertValues, setFakeDbResult } from "./mocks/fakeDb.js";
 
 // tests/setup.ts (preload, ver bunfig.toml) ya reemplazo src/lib/db.ts por
 // el doble en tests/mocks/fakeDb.ts antes de que este archivo importara
@@ -64,6 +64,7 @@ describe("GET /api/comments", () => {
 				country_flag: "mx",
 				country: "Mexico",
 				created_at: "2026-01-01T00:00:00.000Z",
+				status: "published",
 			},
 		]);
 		const res = await app.request("/api/comments", authed());
@@ -95,7 +96,7 @@ describe("POST /api/comments", () => {
 		expect(Array.isArray(body.errors)).toBe(true);
 	});
 
-	it("201 con body valido, count() del doble decide direction", async () => {
+	it("201 con body valido, count() del doble decide direction, status siempre 'pending'", async () => {
 		// 4 comentarios existentes (par) -> el controller debe alternar a "left"
 		setFakeDbResult([{ value: 4 }]);
 		const res = await app.request(
@@ -116,14 +117,17 @@ describe("POST /api/comments", () => {
 		);
 		// El controller hace un segundo select (count) y luego un insert -
 		// el doble resuelve ambos al mismo `state.current` actual, asi que
-		// solo se confirma el status/shape, no el valor exacto de direction
-		// (probarlo de verdad necesitaria dos resultados distintos en
-		// secuencia, que el doble generico no modela - suficiente para
-		// esta fase, la logica de alternancia ya la cubre el unit test de
-		// PostComments si se agrega mas adelante).
+		// el shape exacto de la respuesta no prueba nada por si solo. Lo
+		// que si prueba algo real: el argumento que el controller le paso
+		// a `.values(...)` - confirma que un comentario nuevo NUNCA nace
+		// "published" sin importar que mande el cliente (el schema ya ni
+		// acepta "status" en el body publico, pero esto prueba el
+		// comportamiento del controller, no solo la validacion de entrada).
 		expect(res.status).toBe(201);
 		const body = await res.json();
 		expect(body.success).toBe(true);
+		// biome-ignore lint/suspicious/noExplicitAny: valor crudo capturado por el doble de db
+		expect((getLastInsertValues() as any).status).toBe("pending");
 	});
 
 	it("429 despues de 5 requests en la misma ventana, misma IP", async () => {
@@ -191,19 +195,45 @@ describe("GET /api/projects", () => {
 	});
 });
 
-describe("POST /api/tlgrm", () => {
+describe("POST /api/contact-messages", () => {
 	afterEach(() => {
-		// biome-ignore lint/suspicious/noExplicitAny: restaurar el global real tras el spy
-		(globalThis.fetch as any).mockRestore?.();
+		setFakeDbResult([]);
 	});
 
-	it("201 y llama a la API de Telegram exactamente una vez (fetch mockeado, no manda mensajes reales)", async () => {
-		const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
-			new Response(JSON.stringify({ ok: true }), { status: 200 }),
+	it("400 con body invalido (zod) - reemplaza al /tlgrm viejo, que no validaba nada", async () => {
+		const res = await app.request(
+			"/api/contact-messages",
+			authed({
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"X-Forwarded-For": uniqueIp(),
+				},
+				body: JSON.stringify({ name: "Ana" }), // sin email/phone/more_information
+			}),
 		);
+		expect(res.status).toBe(400);
+		const body = await res.json();
+		expect(body.success).toBe(false);
+		expect(Array.isArray(body.errors)).toBe(true);
+	});
+
+	it("201 con body valido, status siempre 'unread', cero llamadas de red (ya no hay Telegram)", async () => {
+		const fetchSpy = spyOn(globalThis, "fetch");
+		setFakeDbResult([
+			{
+				message_id: 1,
+				name: "Ana",
+				email: "ana@example.com",
+				phone: "+52 555 555 5555",
+				more_information: "Quiero cotizar un proyecto",
+				status: "unread",
+				created_at: "2026-01-01T00:00:00.000Z",
+			},
+		]);
 
 		const res = await app.request(
-			"/api/tlgrm",
+			"/api/contact-messages",
 			authed({
 				method: "POST",
 				headers: {
@@ -213,31 +243,35 @@ describe("POST /api/tlgrm", () => {
 				body: JSON.stringify({
 					name: "Ana",
 					email: "ana@example.com",
-					phone: 5555555,
-					moreInformation: "Quiero cotizar un proyecto",
+					phone: "+52 555 555 5555",
+					more_information: "Quiero cotizar un proyecto",
 				}),
 			}),
 		);
 
 		expect(res.status).toBe(201);
-		expect(fetchSpy).toHaveBeenCalledTimes(1);
+		const body = await res.json();
+		expect(body.success).toBe(true);
+		// biome-ignore lint/suspicious/noExplicitAny: valor crudo capturado por el doble de db
+		expect((getLastInsertValues() as any).status).toBe("unread");
+		// El modulo de Telegram se elimino por completo - este endpoint no
+		// deberia disparar ningun fetch saliente.
+		expect(fetchSpy).not.toHaveBeenCalled();
+		fetchSpy.mockRestore();
 	});
 
 	it("429 despues de 5 requests en la misma ventana, misma IP", async () => {
-		spyOn(globalThis, "fetch").mockResolvedValue(
-			new Response(JSON.stringify({ ok: true }), { status: 200 }),
-		);
 		const ip = uniqueIp();
 		const fire = () =>
 			app.request(
-				"/api/tlgrm",
+				"/api/contact-messages",
 				authed({
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 						"X-Forwarded-For": ip,
 					},
-					body: JSON.stringify({ name: "Ana" }),
+					body: JSON.stringify({ name: "Ana" }), // invalido a proposito - igual cuenta para el limite
 				}),
 			);
 

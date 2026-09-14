@@ -15,9 +15,9 @@ import { errorHandler } from "./middleware/errorHandler.middleware.js";
 import { customLogger } from "./middleware/logger.middleware.js";
 import { token } from "./middleware/token.middleware.js";
 import comments from "./routes/comments.routes.js";
+import contactMessages from "./routes/contactMessages.routes.js";
 import experiences from "./routes/experiences.routes.js";
 import projects from "./routes/projects.routes.js";
-import tlgrm from "./routes/telegram.routes.js";
 
 // Prefijo informativo, NO secreto. Antes era un UUID en API_BASE_PATH
 // tratado como si fuera parte de la autenticacion - no lo es: aparece en
@@ -72,11 +72,12 @@ app.use(jsonBearerAuth(token));
 
 // El rate limit del POST publico (el vector real del hackeo de 800
 // comentarios, ver docs/00-auditoria.md hallazgo 1) vive dentro de cada
-// router (comments.routes.ts, telegram.routes.ts), scoped solo al POST -
-// aplicarlo aqui por path afectaria tambien al GET, que no lo necesita.
+// router (comments.routes.ts, contactMessages.routes.ts), scoped solo al
+// POST - aplicarlo aqui por path afectaria tambien al GET, que no lo
+// necesita.
 app.route("/comments", comments);
 app.route("/projects", projects);
 app.route("/experiences", experiences);
-app.route("/tlgrm", tlgrm);
+app.route("/contact-messages", contactMessages);
 
 export default app;

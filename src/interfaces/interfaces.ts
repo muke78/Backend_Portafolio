@@ -12,18 +12,29 @@ export interface Lang {
 	currentLocale: string;
 }
 
-export interface Telegrm {
-	name: string;
-	email: string;
-	phone: number;
-	moreInformation: string;
-}
+// Cola de moderacion de comentarios (docs/02-comentarios-y-contacto.md):
+// "pending" es como nace todo comentario publico nuevo, "published" es lo
+// que ya existia antes de esta columna (default de migracion, no
+// esconde retroactivamente nada), "hidden" es una moderacion manual del
+// admin (spam/inapropiado sin borrar el registro).
+export const COMMENT_STATUSES = ["pending", "published", "hidden"] as const;
+export type CommentStatus = (typeof COMMENT_STATUSES)[number];
+
+// Reemplaza al modulo de Telegram - ver docs/02-comentarios-y-contacto.md.
+export const CONTACT_MESSAGE_STATUSES = ["unread", "read", "replied"] as const;
+export type ContactMessageStatus = (typeof CONTACT_MESSAGE_STATUSES)[number];
 
 export type {
 	InsertComment,
 	SelectComment,
 	UserInputComment,
 } from "../schemas/comments.js";
+
+export type {
+	ContactMessageUserInput,
+	InsertContactMessage,
+	SelectContactMessage,
+} from "../schemas/contactMessages.js";
 
 // Enums útiles
 export enum CommentDirection {
