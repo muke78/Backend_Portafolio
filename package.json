@@ -12,6 +12,7 @@
     "db:studio": "drizzle-kit studio",
     "backup:turso": "bun run scripts/backup-turso.ts",
     "seed:admin": "bun run scripts/seed-admin-user.ts",
+    "seed:content": "bun run scripts/seed-content.ts",
     "format": "bunx biome format --write ./src ./tests ./scripts",
     "lint": "bunx biome lint --write ./src ./tests ./scripts",
     "check": "bunx biome check --write ./src ./tests ./scripts",

@@ -16,11 +16,14 @@ import { corsMiddleware } from "./middleware/cors.middleware.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
 import { customLogger } from "./middleware/logger.middleware.js";
 import { token } from "./middleware/token.middleware.js";
+import about from "./routes/about.routes.js";
 import auth from "./routes/auth.routes.js";
 import comments from "./routes/comments.routes.js";
 import contactMessages from "./routes/contactMessages.routes.js";
+import education from "./routes/education.routes.js";
 import experiences from "./routes/experiences.routes.js";
 import projects from "./routes/projects.routes.js";
+import skills from "./routes/skills.routes.js";
 
 // Prefijo informativo, NO secreto. Antes era un UUID en API_BASE_PATH
 // tratado como si fuera parte de la autenticacion - no lo es: aparece en
@@ -112,6 +115,9 @@ app.route("/projects", projects);
 app.route("/experiences", experiences);
 app.route("/contact-messages", contactMessages);
 app.route("/auth", auth);
+app.route("/about", about);
+app.route("/education", education);
+app.route("/skills", skills);
 
 export default app;
 

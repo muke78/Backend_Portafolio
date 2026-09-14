@@ -307,7 +307,16 @@ Documentado en detalle en el plan de sesión
   `Content-Type`) y las convenciones nuevas de código (tests por
   recurso, límite de 250 líneas por archivo, tipos centralizados en
   `interfaces.ts`, checklist OWASP) vigentes desde aquí en adelante.
-- **Fase 4c** (repo Portafolio): `login.ts` deja de comparar
-  `ADMIN_PASSWORD` (se elimina) y llama a `POST /auth/login`;
-  `adminSession.ts` embebe el JWT en la cookie de sesión existente;
-  `admin/resource.ts` manda `X-Admin-JWT: Bearer <token>` en escrituras.
+- **Fase 4c** ✅ hecha (repo Portafolio) — `login.ts` dejó de comparar
+  `ADMIN_PASSWORD` (eliminado) y llama a `POST /auth/login`;
+  `adminSession.ts` embebe el JWT en la cookie de sesión existente
+  (`getHonoJwt`/`buildSessionToken(secret, honoJwt)`); `admin/resource.ts`
+  manda `X-Admin-JWT: Bearer <token>` en escrituras + `Content-Type`
+  explícito incluso en `DELETE`. Verificado en vivo (login real, sesión,
+  round-trip completo).
+- **Fase 5a** ✅ hecha — tablas nuevas `about` (singleton, solo
+  `GET`/`PUT`), `education` y `skills` (listas, CRUD completo), mismo
+  patrón `_default`/`_translations` que `experiences.ts`, protegidas por
+  el JWT de Fase 4a. Contenido real migrado desde el código estático de
+  Portafolio vía `scripts/seed-content.ts`. Ver
+  [`06-about-education-skills.md`](06-about-education-skills.md).
