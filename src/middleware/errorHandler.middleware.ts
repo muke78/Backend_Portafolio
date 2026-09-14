@@ -1,27 +1,35 @@
-import fs from "node:fs";
-import path from "node:path";
 import type { Context, Next } from "hono";
-
-const errorLogFile = path.join(process.cwd(), "src/logs", "errors.log");
+import { HTTPException } from "hono/http-exception";
 
 export const errorHandler = async (c: Context, next: Next) => {
 	try {
 		await next();
 	} catch (err) {
-		const log = `[${new Date().toISOString()}] ERROR: ${
-			err instanceof Error ? err.message : "Unknown error"
-		}\nStack: ${err instanceof Error ? err.stack : "No stack"}\n\n`;
+		const requestId = c.get("requestId") ?? "-";
 
-		// Guardar en archivo
-		try {
-			const logDir = path.dirname(errorLogFile);
-			await fs.promises.mkdir(logDir, { recursive: true });
-			await fs.promises.appendFile(errorLogFile, log);
-		} catch (logError) {
-			// Fallback to console if file logging fails
-			console.error("Failed to write to error log file:", logError);
-			console.error("Original error details:", log);
+		if (err instanceof HTTPException) {
+			// Fallos esperados: auth, body-limit, csrf, timeout, rate limit,
+			// validacion Zod - conservar su status/mensaje real en vez de
+			// aplanar todo a 500. Antes solo jsonBearerAuth tenia su propio
+			// try/catch para esto; ahora es responsabilidad central de aqui,
+			// jsonBearerAuth ya no necesita el suyo.
+			console.warn(
+				`[${new Date().toISOString()}] [${requestId}] ${err.status}: ${err.message}`,
+			);
+			return c.json(
+				{
+					success: false,
+					message: err.message || "Request failed",
+				},
+				err.status,
+			);
 		}
+
+		const message = err instanceof Error ? err.message : "Unknown error";
+		const stack = err instanceof Error ? err.stack : "No stack";
+		console.error(
+			`[${new Date().toISOString()}] [${requestId}] ERROR: ${message}\nStack: ${stack}`,
+		);
 
 		return c.json(
 			{
