@@ -56,7 +56,15 @@ export const userInputSchema = insertCommentsSchema.omit({
 // Schema para seleccionar (incluye comment_id)
 export const selectCommentsSchema = createSelectSchema(comments);
 
+// PUT /comments/:id (admin, protegido por JWT) - aprobar/ocultar.
+export const updateCommentStatusSchema = z.object({
+	status: z.enum(COMMENT_STATUSES),
+});
+
 // Tipos TypeScript derivados de los schemas
 export type InsertComment = z.infer<typeof insertCommentsSchema>;
 export type UserInputComment = z.infer<typeof userInputSchema>;
 export type SelectComment = z.infer<typeof selectCommentsSchema>;
+export type UpdateCommentStatusInput = z.infer<
+	typeof updateCommentStatusSchema
+>;

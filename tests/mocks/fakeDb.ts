@@ -20,16 +20,18 @@ type Chainable = any;
 
 const state: { current: unknown } = { current: [] };
 let lastInsertValues: unknown;
+let lastUpdateValues: unknown;
 
 export const setFakeDbResult = (value: unknown): void => {
 	state.current = value;
 };
 
-// Lo que el controller le paso a `.insert(...).values(x)` la ultima vez -
-// para probar que "status: pending" realmente se manda, no solo confiar
-// en que el shape de la respuesta se ve bien (ver comments.test dedicado
-// abajo en app.test.ts).
+// Lo que el controller le paso a `.insert(...).values(x)`/`.update(...).set(x)`
+// la ultima vez - para probar que "status: pending" (o el cambio de
+// status que sea) realmente se manda, no solo confiar en que el shape de
+// la respuesta se ve bien.
 export const getLastInsertValues = (): unknown => lastInsertValues;
+export const getLastUpdateValues = (): unknown => lastUpdateValues;
 
 const chainable = (): Chainable => {
 	const target = (..._args: unknown[]) => chainable();
@@ -44,6 +46,12 @@ const chainable = (): Chainable => {
 					return chainable();
 				};
 			}
+			if (prop === "set") {
+				return (arg: unknown) => {
+					lastUpdateValues = arg;
+					return chainable();
+				};
+			}
 			return () => chainable();
 		},
 	});
@@ -52,4 +60,5 @@ const chainable = (): Chainable => {
 export const fakeDb = {
 	select: (..._args: unknown[]) => chainable(),
 	insert: (..._args: unknown[]) => chainable(),
+	update: (..._args: unknown[]) => chainable(),
 };

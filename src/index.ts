@@ -14,6 +14,7 @@ import { corsMiddleware } from "./middleware/cors.middleware.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
 import { customLogger } from "./middleware/logger.middleware.js";
 import { token } from "./middleware/token.middleware.js";
+import auth from "./routes/auth.routes.js";
 import comments from "./routes/comments.routes.js";
 import contactMessages from "./routes/contactMessages.routes.js";
 import experiences from "./routes/experiences.routes.js";
@@ -79,5 +80,6 @@ app.route("/comments", comments);
 app.route("/projects", projects);
 app.route("/experiences", experiences);
 app.route("/contact-messages", contactMessages);
+app.route("/auth", auth);
 
 export default app;
