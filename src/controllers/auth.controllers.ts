@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
+import type { LoginInput } from "../interfaces/interfaces.js";
 import { db } from "../lib/db.js";
-import { type LoginInput, users } from "../schemas/users.js";
+import { users } from "../schemas/users.js";
 
 export type LoginResult =
 	| { ok: true; userId: number; email: string }

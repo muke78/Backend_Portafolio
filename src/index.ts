@@ -42,6 +42,14 @@ app.use("*", errorHandler);
 app.use("*", trimTrailingSlash());
 app.use("*", secureHeaders());
 app.use("*", corsMiddleware());
+// OJO al integrar un cliente nuevo (ver docs/04-hono-projects-experiences-crud.md,
+// hallazgo real encontrado escribiendo los tests de la Fase 4b): este
+// middleware trata cualquier request SIN header Content-Type como si
+// fuera "text/plain" (uno de los tres tipos de formulario que protege) y
+// la bloquea con 403 si tampoco trae Origin/Sec-Fetch-Site - exactamente
+// el caso de un DELETE sin body. Todo cliente de este API (el proxy de
+// Astro incluido) tiene que mandar Content-Type: application/json en
+// CADA escritura, incluidas las que no llevan body.
 app.use(
 	"*",
 	csrf({

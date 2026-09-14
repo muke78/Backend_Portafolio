@@ -1,5 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import type { JwtVariables } from "hono/jwt";
 import {
 	GetAllContactMessages,
@@ -7,6 +8,9 @@ import {
 	UpdateContactMessageStatus,
 } from "../controllers/contactMessages.controllers.js";
 import type { ApiResponse } from "../interfaces/interfaces.js";
+import { auditLog } from "../lib/auditLog.js";
+import { parseId } from "../lib/parseId.js";
+import { zodErrorHook } from "../lib/zodErrorHook.js";
 import { adminAuth } from "../middleware/adminAuth.middleware.js";
 import { rateLimit } from "../middleware/rateLimit.middleware.js";
 import {
@@ -33,19 +37,7 @@ router.get("/", adminAuth, async (c) => {
 router.post(
 	"/",
 	rateLimit({ limit: 5, windowMs: 60_000 }),
-	// Mismo hook de error que comments.routes.ts/auth.routes.ts.
-	zValidator("json", contactMessageUserInputSchema, (result, c) => {
-		if (!result.success) {
-			return c.json(
-				{
-					success: false,
-					message: "Datos invalidos",
-					errors: result.error.issues,
-				} as ApiResponse<null>,
-				400,
-			);
-		}
-	}),
+	zValidator("json", contactMessageUserInputSchema, zodErrorHook),
 	async (c) => {
 		const data = c.req.valid("json");
 		const result = await PostContactMessage(data);
@@ -64,38 +56,23 @@ router.post(
 router.put(
 	"/:id",
 	adminAuth,
-	zValidator("json", updateContactMessageStatusSchema, (result, c) => {
-		if (!result.success) {
-			return c.json(
-				{
-					success: false,
-					message: "Datos invalidos",
-					errors: result.error.issues,
-				} as ApiResponse<null>,
-				400,
-			);
-		}
-	}),
+	zValidator("json", updateContactMessageStatusSchema, zodErrorHook),
 	async (c) => {
-		const id = Number(c.req.param("id"));
-		if (!Number.isInteger(id)) {
-			return c.json(
-				{ success: false, message: "id invalido" } as ApiResponse<null>,
-				400,
-			);
-		}
+		const id = parseId(c.req.param("id"));
 
 		const { status } = c.req.valid("json");
 		const result = await UpdateContactMessageStatus(id, status);
 		if (!result) {
-			return c.json(
-				{
-					success: false,
-					message: "Mensaje no encontrado",
-				} as ApiResponse<null>,
-				404,
-			);
+			throw new HTTPException(404, { message: "Mensaje no encontrado" });
 		}
+
+		const { email } = c.get("jwtPayload");
+		auditLog({
+			adminEmail: email,
+			action: "update",
+			resource: "contact-messages",
+			resourceId: id,
+		});
 
 		return c.json(
 			{ success: true, data: result } as ApiResponse<typeof result>,

@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
-import type { ContactMessageStatus } from "../interfaces/interfaces.js";
+import type {
+	ContactMessageStatus,
+	ContactMessageUserInput,
+	SelectContactMessage,
+} from "../interfaces/interfaces.js";
 import { db } from "../lib/db.js";
-import {
-	type ContactMessageUserInput,
-	contactMessages,
-	type SelectContactMessage,
-} from "../schemas/contactMessages.js";
+import { contactMessages } from "../schemas/contactMessages.js";
 
 // Reemplaza al modulo de Telegram - ver docs/02-comentarios-y-contacto.md.
 export async function PostContactMessage({
