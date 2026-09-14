@@ -20,7 +20,7 @@ export NVM_DIR="$HOME/.nvm"
 echo "🔍 CI local antes del push..."
 
 echo "📦 1/3 Biome (lint + format)..."
-bunx biome check --write ./src ./tests
+bunx biome check --write ./src ./tests ./scripts
 
 echo "🔎 2/3 TypeScript (tsc --noEmit)..."
 bunx tsc --noEmit

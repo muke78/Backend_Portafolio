@@ -279,13 +279,14 @@ Además del `bun test` automatizado:
   producción (para no ensuciarla con comentarios de prueba) — cubierto
   por el test automatizado con la base mockeada en su lugar.
 
-## Fases siguientes (no ejecutadas en esta ronda)
+## Fases siguientes
 
 Documentado en detalle en el plan de sesión
 (`C:\Users\MikeT\.claude\plans\stateless-humming-pinwheel.md`) y en
 `docs/TODO.md` §5 del repo Portafolio:
 
-- **Fase 2**: backup completo de Turso antes de tocar cualquier tabla.
+- **Fase 2** ✅ hecha — backup completo de Turso antes de tocar cualquier
+  tabla. Ver [`01-backup-turso.md`](01-backup-turso.md).
 - **Fase 3**: columna `status` en `comments` (moderación — nada se
   publica en vivo sin pasar por el admin/dashboard), tabla
   `contact_messages` nueva, eliminación completa del módulo de Telegram
