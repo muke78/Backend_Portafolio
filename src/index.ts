@@ -8,6 +8,7 @@ import { type RequestIdVariables, requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
 import { timeout } from "hono/timeout";
 import { trimTrailingSlash } from "hono/trailing-slash";
+import packageJson from "../package.json" with { type: "json" };
 import { jsonBearerAuth } from "./middleware/auth.middleware.js";
 import { corsMiddleware } from "./middleware/cors.middleware.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
@@ -60,7 +61,7 @@ app.get("/", async (c) => {
 		name: "Backend_Portafolio",
 		description:
 			"Entornos de envio y recibo de informacion serverless para portafolio",
-		version: "0.1.0",
+		version: packageJson.version,
 		author_name: "Erick Muke",
 		github_name: "https://github.com/muke78",
 	});
