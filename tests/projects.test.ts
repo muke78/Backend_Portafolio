@@ -18,6 +18,12 @@ describe("GET /api/projects", () => {
 		expect(res.status).toBe(400);
 	});
 
+	it("200 con currentLocale presente pero no soportado - cae al fallback, no 400", async () => {
+		setFakeDbResult([]);
+		const res = await app.request("/api/projects?currentLocale=xx", authed());
+		expect(res.status).toBe(200);
+	});
+
 	it("200 con currentLocale valido", async () => {
 		setFakeDbResult([]);
 		const res = await app.request("/api/projects?currentLocale=en", authed());

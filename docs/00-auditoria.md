@@ -186,7 +186,7 @@ onion: el primero registrado envuelve a los siguientes).
 | `hono/jsx-renderer` | ❌ no aplica | Esto es una API pura, sin JSX/HTML. |
 | `hono/jwt` | ✅ Fase 4a | Pieza central del hallazgo 3 (JWT de sesión admin) — ver `03-hono-admin-auth.md`. |
 | `hono/jwk` | ❌ no aplica | Es para verificar JWTs de un proveedor externo (OAuth/OIDC) vía JWKS público - este JWT es interno, firmado con una clave simétrica propia (`HS256`), no hay proveedor externo que publique claves. |
-| `hono/language` | ❌ no todavía | Duplicaría `?currentLocale=` (el contrato que Astro ya usa) sin necesidad — cambiar el contrato de locale no es parte de este hardening. |
+| `hono/language` | ✅ agregado (pedido explícito) | Configurado con `lookupQueryString: "currentLocale"` — mismo nombre que ya usaba el contrato con Astro, no lo duplica. Ver [`05-hono-language-and-best-practices.md`](05-hono-language-and-best-practices.md) para el detalle y el cambio de comportamiento (locale inválido-pero-presente ya no es 400, cae al fallback). |
 | `hono/method-override` | ❌ no aplica | El admin es un cliente moderno (fetch), no un `<form>` viejo que necesite espoofear PUT/DELETE. |
 | `hono/timing` | ❌ no | Expone timing interno en un header público — más riesgo de fuga de info que valor real hoy. |
 

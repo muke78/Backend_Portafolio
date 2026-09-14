@@ -2,33 +2,25 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { JwtVariables } from "hono/jwt";
+import type { LanguageVariables } from "hono/language";
 import {
 	CreateProject,
 	DeleteProject,
 	GetAllProjects,
 	UpdateProject,
 } from "../controllers/projects.controllers.js";
-import {
-	type ApiResponse,
-	LOCALES,
-	type Locale,
-} from "../interfaces/interfaces.js";
+import type { ApiResponse } from "../interfaces/interfaces.js";
 import { auditLog } from "../lib/auditLog.js";
 import { parseId } from "../lib/parseId.js";
+import { requireLocale } from "../lib/requireLocale.js";
 import { zodErrorHook } from "../lib/zodErrorHook.js";
 import { adminAuth } from "../middleware/adminAuth.middleware.js";
 import { projectAdminInputSchema } from "../schemas/projects.js";
 
-const router = new Hono<{ Variables: JwtVariables }>();
+const router = new Hono<{ Variables: JwtVariables & LanguageVariables }>();
 
 router.get("/", async (c) => {
-	const currentLocale = c.req.query("currentLocale");
-
-	if (!currentLocale || !LOCALES.includes(currentLocale as Locale)) {
-		throw new HTTPException(400, {
-			message: "Parámetro currentLocale inválido. Solo se permite en, es o fr",
-		});
-	}
+	const currentLocale = requireLocale(c);
 	const result = await GetAllProjects({ currentLocale });
 	return c.json(
 		{ success: true, data: result } as ApiResponse<typeof result>,
