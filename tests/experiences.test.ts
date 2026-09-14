@@ -13,12 +13,20 @@ describe("GET /api/experiences", () => {
 		expect(res.status).toBe(400);
 	});
 
-	it("400 con currentLocale invalido", async () => {
+	it("200 con currentLocale presente pero no soportado - cae al fallback (es), no 400", async () => {
+		// Cambio de comportamiento intencional (hono/language, ver
+		// docs/05-hono-language-and-best-practices.md): un valor PRESENTE
+		// pero no reconocido ya no se rechaza - se normaliza al idioma mas
+		// cercano o cae al fallback. El 400 se reserva para cuando el
+		// parametro esta AUSENTE del todo (ver el test de arriba) - ese es
+		// el bug real que ya paso una vez (el proxy de Astro olvido
+		// reenviarlo).
+		setFakeDbResult([]);
 		const res = await app.request(
 			"/api/experiences?currentLocale=xx",
 			authed(),
 		);
-		expect(res.status).toBe(400);
+		expect(res.status).toBe(200);
 	});
 
 	it("200 con currentLocale valido", async () => {

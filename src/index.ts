@@ -3,12 +3,14 @@ import { bodyLimit } from "hono/body-limit";
 import { compress } from "hono/compress";
 import { csrf } from "hono/csrf";
 import { etag } from "hono/etag";
+import { type LanguageVariables, languageDetector } from "hono/language";
 import { prettyJSON } from "hono/pretty-json";
 import { type RequestIdVariables, requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
 import { timeout } from "hono/timeout";
 import { trimTrailingSlash } from "hono/trailing-slash";
 import packageJson from "../package.json" with { type: "json" };
+import { LOCALES } from "./interfaces/interfaces.js";
 import { jsonBearerAuth } from "./middleware/auth.middleware.js";
 import { corsMiddleware } from "./middleware/cors.middleware.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
@@ -26,7 +28,9 @@ import projects from "./routes/projects.routes.js";
 // en cualquier proxy/CDN intermedio. La seguridad real vive en el bearer
 // token + el rate limit de abajo, no en el nombre del path. Ver
 // docs/00-auditoria.md hallazgo 2.
-const app = new Hono<{ Variables: RequestIdVariables }>().basePath("/api");
+const app = new Hono<{
+	Variables: RequestIdVariables & LanguageVariables;
+}>().basePath("/api");
 
 // --- Middlewares globales, en orden (el registrado primero envuelve a los
 // siguientes - modelo onion de Hono) ---
@@ -42,6 +46,25 @@ app.use("*", errorHandler);
 app.use("*", trimTrailingSlash());
 app.use("*", secureHeaders());
 app.use("*", corsMiddleware());
+// Mismo query param que ya usaba /projects y /experiences a mano
+// (?currentLocale=), asi que este middleware no cambia el contrato con
+// Astro - solo le suma normalizacion real (es-MX -> es por truncamiento
+// progresivo, case-insensitive) que la validacion manual (LOCALES.includes)
+// no hacia. `caches: false`: esta API es sin estado, no hace falta una
+// cookie de idioma en las respuestas. Disponible en cualquier ruta via
+// c.get("language"); comments/contact-messages/auth no lo usan (no
+// tienen contenido por locale), pero aplicarlo global es mas simple que
+// scopearlo a dos routers nada mas.
+app.use(
+	"*",
+	languageDetector({
+		order: ["querystring"],
+		lookupQueryString: "currentLocale",
+		supportedLanguages: [...LOCALES],
+		fallbackLanguage: "es",
+		caches: false,
+	}),
+);
 // OJO al integrar un cliente nuevo (ver docs/04-hono-projects-experiences-crud.md,
 // hallazgo real encontrado escribiendo los tests de la Fase 4b): este
 // middleware trata cualquier request SIN header Content-Type como si
@@ -91,3 +114,11 @@ app.route("/contact-messages", contactMessages);
 app.route("/auth", auth);
 
 export default app;
+
+// Habilita el cliente RPC tipado de Hono (`hono/client`) para quien
+// quiera consumirlo mas adelante - hoy Portafolio le habla con axios
+// (docs/04-hono-projects-experiences-crud.md), asi que esto no cambia
+// nada todavia, pero exportar el tipo no cuesta nada y deja la puerta
+// abierta sin tener que tocar este archivo despues
+// (https://hono.dev/docs/guides/best-practices).
+export type AppType = typeof app;
