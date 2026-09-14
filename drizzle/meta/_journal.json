@@ -71,6 +71,13 @@
       "when": 1757470293929,
       "tag": "0009_new_taskmaster",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1789373135481,
+      "tag": "0010_crazy_killmonger",
+      "breakpoints": true
     }
   ]
 }

@@ -287,12 +287,16 @@ Documentado en detalle en el plan de sesión
 
 - **Fase 2** ✅ hecha — backup completo de Turso antes de tocar cualquier
   tabla. Ver [`01-backup-turso.md`](01-backup-turso.md).
-- **Fase 3**: columna `status` en `comments` (moderación — nada se
-  publica en vivo sin pasar por el admin/dashboard), tabla
-  `contact_messages` nueva, eliminación completa del módulo de Telegram
-  (`BOT_TOKEN`/`CHAT_ID`, controllers, routes), y del lado de Portafolio
-  conectar el rate limit real al proxy público + apuntar el form de
-  contacto al nuevo endpoint.
+- **Fase 3** ✅ hecha, del lado de este repo — columna `status` en
+  `comments` (moderación — nada se publica en vivo sin pasar por el
+  admin/dashboard), tabla `contact_messages` nueva, eliminación completa
+  del módulo de Telegram. Ver
+  [`02-comentarios-y-contacto.md`](02-comentarios-y-contacto.md)
+  (incluye un hallazgo real de infraestructura: `bun run db:migrate`
+  estaba roto, `__drizzle_migrations` desincronizada de los archivos de
+  migración). **Pendiente, del lado de Portafolio** (otro repo, otro
+  PR): apuntar `Form.tsx`/`tlgrm.ts` al nuevo endpoint + conectar el
+  rate limit real al proxy público de `comments`.
 - **Fase 4**: JWT de sesión admin (hallazgo 3), distinto del
   `API_TOKEN` fijo, para todas las rutas de escritura admin — depende de
   que exista la tabla `users`/`admin_users`.
