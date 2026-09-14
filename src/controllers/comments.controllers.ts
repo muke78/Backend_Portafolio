@@ -1,4 +1,5 @@
 import { count, eq, sql } from "drizzle-orm";
+import type { CommentStatus } from "../interfaces/interfaces.js";
 import { db } from "../lib/db.js";
 import {
 	comments,
@@ -38,12 +39,8 @@ export async function GetAllComments(): Promise<SelectComment[]> {
 }
 
 // Lectura para el admin: todos los estados, incluye "pending"/"hidden".
-// Definida ya (no se vuelve a tocar este archivo en la Fase 4), pero
-// todavia SIN ruta que la exponga - no hay forma real de distinguir hoy
-// "es el admin autenticado" de "trae el API_TOKEN fijo" (mismo token para
-// todo), asi que exponerla ahora seria mostrar comentarios pendientes a
-// cualquiera con el token publico. Se conecta a una ruta real en la Fase
-// 4 (JWT de sesion admin, docs/00-auditoria.md hallazgo 3).
+// Protegida por adminAuth (JWT) en comments.routes.ts - ver
+// docs/03-hono-admin-auth.md.
 export async function GetAllCommentsAdmin(): Promise<SelectComment[]> {
 	const allComments = await db
 		.select(PUBLIC_COLUMNS)
@@ -52,6 +49,21 @@ export async function GetAllCommentsAdmin(): Promise<SelectComment[]> {
 		.all();
 
 	return allComments.map(toDateOnly);
+}
+
+// Aprobar/ocultar un comentario - la unica forma real de que un
+// comentario "pending" llegue a verse en el sitio publico.
+export async function UpdateCommentStatus(
+	commentId: number,
+	status: CommentStatus,
+): Promise<SelectComment | null> {
+	const result = await db
+		.update(comments)
+		.set({ status })
+		.where(eq(comments.comment_id, commentId))
+		.returning();
+
+	return result[0] ? toDateOnly(result[0]) : null;
 }
 
 export async function PostComments({

@@ -46,8 +46,16 @@ export const contactMessageUserInputSchema = insertContactMessageSchema.omit({
 
 export const selectContactMessageSchema = createSelectSchema(contactMessages);
 
+// PUT /contact-messages/:id (admin, protegido por JWT) - marcar leido/respondido.
+export const updateContactMessageStatusSchema = z.object({
+	status: z.enum(CONTACT_MESSAGE_STATUSES),
+});
+
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
 export type ContactMessageUserInput = z.infer<
 	typeof contactMessageUserInputSchema
 >;
 export type SelectContactMessage = z.infer<typeof selectContactMessageSchema>;
+export type UpdateContactMessageStatusInput = z.infer<
+	typeof updateContactMessageStatusSchema
+>;

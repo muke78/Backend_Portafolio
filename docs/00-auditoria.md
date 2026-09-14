@@ -68,10 +68,12 @@ backend.
 
 Ya diagnosticado con solución propuesta en `docs/03-diseno-api.md`
 (Portafolio): JWT de sesión admin de corta duración para escrituras
-admin, el token fijo se queda solo para lecturas públicas. **No
-implementado en esta fase** — depende de que exista la tabla
-`users`/`admin_users` (TODO.md §5.2 de Portafolio). Queda como Fase 4 de
-este documento.
+admin, el token fijo se queda solo para lecturas públicas. **Resuelto en
+la Fase 4a** — ver [`03-hono-admin-auth.md`](03-hono-admin-auth.md):
+tabla `users` real, `POST /auth/login`, JWT (`hono/jwt`, `HS256`)
+aplicado a las rutas admin de `comments`/`contact_messages`. El CRUD de
+`projects`/`experiences` queda para la Fase 4b, y la conexión del lado de
+Astro (login real, ya no `ADMIN_PASSWORD`) para la Fase 4c.
 
 ### 4. `POST /tlgrm` sin validación Zod, interpola sin escapar en Markdown
 
@@ -178,11 +180,12 @@ onion: el primero registrado envuelve a los siguientes).
 | `hono/csrf` | ✅ nuevo, con matiz documentado | Ver "Nota honesta sobre CSRF" abajo — se agrega como defensa en profundidad barata, no como el mecanismo principal. |
 | `hono/basic-auth` | ❌ no aplica | Ya hay bearer auth; no hace falta un segundo esquema. |
 | `hono/cache` | ❌ no todavía | Tiene sentido una vez que exista invalidación por escritura real (TODO.md §5.3 de Portafolio, ligado a las tablas nuevas) — cachear ahora sin eso deja datos viejos tras cada cambio del admin. |
-| `hono/combine` | ❌ no todavía | Útil cuando haya que aplicar sets de middleware distintos a rutas públicas vs. admin (Fase 4, JWT) — hoy no hay esa bifurcación todavía. |
+| `hono/combine` | ❌ no todavía | Útil cuando haya que aplicar sets de middleware distintos a rutas públicas vs. admin en más rutas (Fase 4b, CRUD de `projects`/`experiences`) — con solo 4 rutas admin hoy (Fase 4a) no vale la pena todavía. |
 | `hono/context-storage` | ❌ no | `c` ya se pasa explícito a todo lo que lo necesita; no hay un caso real hoy que justifique `AsyncLocalStorage`. |
 | `hono/ip-restriction` | ❌ no aplica | El admin no trabaja desde IPs fijas. |
 | `hono/jsx-renderer` | ❌ no aplica | Esto es una API pura, sin JSX/HTML. |
-| `hono/jwt`, `hono/jwk` | ⏳ Fase 4 | Es justo la pieza central del hallazgo 3 (JWT de sesión admin) — se implementa cuando exista la tabla de usuarios, no antes. |
+| `hono/jwt` | ✅ Fase 4a | Pieza central del hallazgo 3 (JWT de sesión admin) — ver `03-hono-admin-auth.md`. |
+| `hono/jwk` | ❌ no aplica | Es para verificar JWTs de un proveedor externo (OAuth/OIDC) vía JWKS público - este JWT es interno, firmado con una clave simétrica propia (`HS256`), no hay proveedor externo que publique claves. |
 | `hono/language` | ❌ no todavía | Duplicaría `?currentLocale=` (el contrato que Astro ya usa) sin necesidad — cambiar el contrato de locale no es parte de este hardening. |
 | `hono/method-override` | ❌ no aplica | El admin es un cliente moderno (fetch), no un `<form>` viejo que necesite espoofear PUT/DELETE. |
 | `hono/timing` | ❌ no | Expone timing interno en un header público — más riesgo de fuga de info que valor real hoy. |
@@ -287,16 +290,19 @@ Documentado en detalle en el plan de sesión
 
 - **Fase 2** ✅ hecha — backup completo de Turso antes de tocar cualquier
   tabla. Ver [`01-backup-turso.md`](01-backup-turso.md).
-- **Fase 3** ✅ hecha, del lado de este repo — columna `status` en
-  `comments` (moderación — nada se publica en vivo sin pasar por el
-  admin/dashboard), tabla `contact_messages` nueva, eliminación completa
-  del módulo de Telegram. Ver
-  [`02-comentarios-y-contacto.md`](02-comentarios-y-contacto.md)
-  (incluye un hallazgo real de infraestructura: `bun run db:migrate`
-  estaba roto, `__drizzle_migrations` desincronizada de los archivos de
-  migración). **Pendiente, del lado de Portafolio** (otro repo, otro
-  PR): apuntar `Form.tsx`/`tlgrm.ts` al nuevo endpoint + conectar el
-  rate limit real al proxy público de `comments`.
-- **Fase 4**: JWT de sesión admin (hallazgo 3), distinto del
-  `API_TOKEN` fijo, para todas las rutas de escritura admin — depende de
-  que exista la tabla `users`/`admin_users`.
+- **Fase 3** ✅ hecha, ambos repos — columna `status` en `comments`
+  (moderación), tabla `contact_messages` nueva, eliminación completa del
+  módulo de Telegram, rate limit conectado al proxy público de Portafolio
+  (`v3.7.0`). Ver [`02-comentarios-y-contacto.md`](02-comentarios-y-contacto.md).
+- **Fase 4a** ✅ hecha — tabla `users` (Argon2id vía `Bun.password`),
+  `POST /auth/login`, JWT de sesión admin (hallazgo 3) distinto del
+  `API_TOKEN` fijo, aplicado a `GET/PUT` de `comments`/`contact_messages`
+  admin. Ver [`03-hono-admin-auth.md`](03-hono-admin-auth.md) — incluye
+  la reparación real (esta vez sí) de `__drizzle_migrations`.
+- **Fase 4b**: CRUD completo (`POST`/`PUT`/`DELETE`) de `projects` y
+  `experiences`, protegido por el JWT de 4a — hoy no existe nada de
+  escritura para estos dos recursos en Hono.
+- **Fase 4c** (repo Portafolio): `login.ts` deja de comparar
+  `ADMIN_PASSWORD` (se elimina) y llama a `POST /auth/login`;
+  `adminSession.ts` embebe el JWT en la cookie de sesión existente;
+  `admin/resource.ts` manda `X-Admin-JWT: Bearer <token>` en escrituras.

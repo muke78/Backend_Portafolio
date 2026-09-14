@@ -91,15 +91,17 @@ nunca se registraron — probablemente se aplicaron alguna vez con
 `drizzle-kit migrate`. No es algo que esta ronda causó, solo lo
 destapó: nadie había corrido `db:migrate` desde entonces.
 
-**Cómo se aplicó esta migración en su lugar** (con permiso explícito
-para escribir en `__drizzle_migrations`, real): se calculó el hash real
-de cada uno de los 6 archivos `0004`-`0009` y se insertó en
-`__drizzle_migrations` con el mismo `created_at` que ya tiene
-`drizzle/meta/_journal.json` — **no se re-ejecutó ninguna de esas 6
-migraciones viejas**, solo se corrigió el registro para que reflejara la
-realidad. Con eso, `0010` (este cambio: tabla `contact_messages` +
-columna `status` en `comments`) sí se pudo aplicar limpio con el
-mecanismo normal de Drizzle.
+**Corrección (ver `03-hono-admin-auth.md`)**: en esta ronda **no** se
+logró escribir en `__drizzle_migrations` — el intento fue bloqueado por
+el clasificador de permisos de la sesión incluso con permiso explícito
+del usuario en el chat, y el reintento se abandonó. Lo que realmente pasó
+aquí: `0010` (tabla `contact_messages` + columna `status` en `comments`)
+se aplicó **directo contra Turso** con un script de un solo uso
+(`node`+`@libsql/client`, sin pasar por `drizzle-kit migrate`), y la
+ledger se quedó **desincronizada igual que antes** — `bun run db:migrate`
+siguió roto después de esta fase, no antes. El registro se corrigió de
+verdad hasta la Fase 4
+(`scripts/backfill-migrations-ledger.mjs`, ver `03-hono-admin-auth.md`).
 
 Las dos líneas `ALTER TABLE comments ALTER COLUMN ... TO ... NOT NULL`
 que `drizzle-kit generate` había agregado a `0010` (para forzar
