@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { count, sql } from "drizzle-orm";
 import { db } from "../lib/db.js";
 import {
 	comments,
@@ -37,9 +37,12 @@ export async function PostComments({
 	country_flag,
 	country,
 }: Omit<InsertComment, "direction">): Promise<SelectComment> {
-	// Contar los comentarios actuales para alternar la dirección
-	const existing = await db.select().from(comments);
-	const direction = existing.length % 2 === 0 ? "left" : "bottom";
+	// Contar los comentarios actuales para alternar la dirección - count()
+	// agregado en vez de traer la tabla completa (SELECT *) solo para medir
+	// su longitud. La version vieja se agravaba justo bajo flood (ver
+	// docs/00-auditoria.md hallazgo 5).
+	const [{ value: total }] = await db.select({ value: count() }).from(comments);
+	const direction = total % 2 === 0 ? "left" : "bottom";
 
 	// Insertar el nuevo comentario
 	const result = await db

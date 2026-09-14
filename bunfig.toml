@@ -1,0 +1,5 @@
+[test]
+# Corre antes que cualquier archivo de test - registra el mock de
+# src/lib/db.ts antes de que src/index.ts (importado por los tests) lo
+# importe de verdad. Ver tests/setup.ts.
+preload = ["./tests/setup.ts"]
